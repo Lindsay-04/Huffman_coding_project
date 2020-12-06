@@ -43,13 +43,69 @@ Status test_function_C(){
 
 Status test_function_D(){
 
+     LinkedList* linkedList = NULL;
+     LinkedList* new_element = NULL;
+     Node* tree = NULL;
+
+     printf("File Tasses.txt\n");
+     display_number_of_characters_file("Tasses.txt");
+
+     linkedList = characters_occurrences_text(linkedList, new_element, "Tasses.txt");
+     printf("\nList display : ");
+     display_list(linkedList);
+
+     printf("\n\nDisplay of occurrences\n\n");
+     display_occurrences(linkedList);
+
+     printf("\nHuffman tree\n");
+     tree = create_Huffman_tree(linkedList);
+
+     printf("\nTree display (prefix order) : ");
+     display_tree(tree);
+
+     printf("\n");
+
+     free_list(linkedList);
+     free_tree(tree);
+
      return OK;
 
 }
 
 Status test_function_E(){
 
-     return OK;
+    LinkedList* linkedList = NULL;
+    LinkedList* new_element = NULL;
+    Node* tree = NULL;
+    int string_array[BUFSIZ] = {0};
+
+    printf("File Tasses.txt\n");
+    display_number_of_characters_file("Tasses.txt");
+
+    read_translate_file("Tasses.txt", "Tasses - Output.txt");
+    printf("Now, the Tasses - Output.txt file contains the binary representation of the text found in the Tasses.txt file.\n");
+
+    linkedList = characters_occurrences_text(linkedList, new_element, "Tasses.txt");
+    printf("\nList display : ");
+    display_list(linkedList);
+
+    printf("\n\nDisplay of occurrences\n\n");
+    display_occurrences(linkedList);
+
+    printf("\nHuffman tree\n");
+    tree = create_Huffman_tree(linkedList);
+
+    printf("\nTree display (prefix order) : ");
+    display_tree(tree);
+
+    printf("\n");
+
+    Huffman_dictionary("Tasses.txt", "Tasses - Output.txt", "Dico.txt");
+
+    free_list(linkedList);
+    free_tree(tree);
+
+    return OK;
 
 }
 
