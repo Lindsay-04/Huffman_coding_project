@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 /**
  * \typedef struct LinkedList
@@ -31,7 +32,7 @@ typedef struct LinkedList{
 typedef struct Node{
 
     char character;
-    int weight;
+    int frequency;
     struct Node* left;
     struct Node* right;
 
@@ -44,6 +45,7 @@ typedef struct Node{
 typedef struct Element{
 
     Node* data;
+    int number_of_occurrences;
     struct Element* next;
 
 }Element;
@@ -119,17 +121,49 @@ extern void           free_list                   (LinkedList* linkedList);
 
 /**
  * \brief Function to create a node in a tree.
- * \param value, a string to define the value of the node.
+ * \param character, a string to define the letter of the node.
+ * \param frequency, an integer to define the number of occurrences of the node.
  * \return the node created.
  */
-extern Node*          create_node                 (char value);
+ extern Node*         create_node                 (char character, int frequency);
+
+/**
+ * \brief Function to create a internal node in a tree.
+ * \param frequency, an integer to define the number of occurrences of the internal node.
+ * \return the internal node created.
+ */
+extern Node*          create_empty_node           (int frequency);
 
 /**
  * \brief Function to add a node to a tree.
  * \param tree, the tree receiving nodes.
  * \param value, a string to define the value of the node to add.
  */
-extern void           add_node                    (Node** tree, char value);
+extern void           add_node                    (Node** tree, int value);
+
+/**
+ * \brief Function to add a leaf node to a tree.
+ * \param tree, the tree receiving nodes.
+ * \param character, a string to define the letter of the node to add.
+ * \param frequency, an integer to define the number of occurrences of the node to add.
+ */
+extern void           add_leaf_node               (Node** tree, char character, int frequency);
+
+/**
+ * \brief Function to add a node at the left.
+ * \param root, the root node.
+ * \param character, a string to define the letter of the node to add.
+ * \param frequency, an integer to define the number of occurrences of the node to add.
+ */
+extern Node*          add_left                    (Node* root, char character, int frequency);
+
+/**
+ * \brief Function to add a node at the right.
+ * \param root, the root node .
+ * \param character, a string to define the letter of the node to add.
+ * \param frequency, an integer to define the number of occurrences of the node to add.
+ */
+extern Node*          add_right                    (Node* root, char character, int frequency);
 
 /**
  * \brief Function to display a tree.
@@ -191,7 +225,7 @@ extern LinkedList*    delete_element_linkedlist   (LinkedList* linkedList, const
  * \param linkedList, the linkedList to browse.
  * \return the smallest element of the linked list.
  */
-extern LinkedList*    min_list                    (LinkedList* linkedList);
+extern LinkedList*    min_linkedlist              (LinkedList* linkedList);
 
 /**
  * \brief Function to create an Huffman tree from a list of occurrences.
@@ -202,11 +236,11 @@ extern Node*          create_Huffman_tree         (LinkedList* linkedList);
 
 /**
  * \brief Function to stores the dictionary from the Huffman tree in a text file.
- * \param name_file, a string to define the text file.
- * \param string_array, an array to remember the path browsed to each node.
- * \return the tree.
+ * \param name_source_file, a string to define the input file.
+ * \param name_destination_file, a string to define the output file.
+ * \param dico, a string to define the dictionary file.
  */
-extern Node*          Huffman_dictionary          (const char* name_file, const char string_array[]);
+ extern void          Huffman_dictionary           (const char* name_source_file, const char* name_destination_file, const char *dico);
 
 /**
  * \brief Function to translate a text into a binary sequence based on a Huffman dictionary.
@@ -225,9 +259,10 @@ extern void           compress_file               (const char* name_source_file,
 /**
  * \brief Function to decompress a text file.
  * \param name_source_file, a string to define the input file.
- * \param dico, a dictionary.
+ * \param dico, a string to define the dictionary file.
  * \param name_destination_file, a string to define the output file.
  */
 extern void           decompress_file             (const char* name_source_file, const char* dico, const char* name_destination_file);
 
 #endif // PART_2_H_INCLUDED
+
