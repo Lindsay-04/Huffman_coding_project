@@ -2,7 +2,7 @@
 
 LinkedList* create_element(char new_character){
 
-    LinkedList *new_element;
+    LinkedList* new_element;
     new_element = malloc(1 * sizeof(LinkedList));
 
     if (new_element == NULL){
@@ -43,7 +43,7 @@ int position(const LinkedList* linkedList, const char x){
 
 }
 
-int number_of_occurrences_file(const char* name_file, char searched_character){
+int number_of_occurrences_file(const char* name_file, const char searched_character){
 
     FILE* file = NULL;
 
@@ -157,10 +157,11 @@ void free_list(LinkedList* linkedList){
     }
 }
 
-Node* create_node(char value){
+Node* create_node(char character, int frequency){
 
     Node* new_element = (Node *) malloc(sizeof(Node));
-    new_element->character = value;
+    new_element->character = character;
+    new_element->frequency = frequency;
     new_element->left = NULL;
     new_element->right = NULL;
 
@@ -168,11 +169,22 @@ Node* create_node(char value){
 
 }
 
-void add_node(Node** tree, char value){
+Node* create_empty_node(int frequency){
+
+    Node* new_element = (Node *) malloc(sizeof(Node));
+    new_element->frequency = frequency;
+    new_element->left = NULL;
+    new_element->right = NULL;
+
+    return new_element;
+
+}
+
+void add_node(Node** tree, int value){
 
     if (*tree == NULL){
 
-        *tree = create_node(value);
+        *tree = create_empty_node(value);
     }
     else{
 
@@ -192,13 +204,65 @@ void add_node(Node** tree, char value){
 
 }
 
+void add_leaf_node(Node** tree, char character, int frequency){
+
+    if (*tree == NULL){
+
+        *tree = create_node(character, frequency);
+    }
+    else{
+
+        if ((*tree)->character > frequency){
+
+            add_leaf_node(&((*tree)->left), character, frequency);
+
+        }
+
+        else if ((*tree)->character < frequency){
+
+            add_leaf_node(&((*tree)->right), character, frequency);
+
+        }
+
+    }
+
+}
+
+Node* add_left(Node* root, char character, int frequency){
+
+    root->left = create_node(character, frequency);
+
+    return root->left;
+
+}
+
+Node* add_right(Node* root, char character, int frequency){
+
+    root->right = create_node(character, frequency);
+
+    return root->right;
+
+}
+
 void display_tree(Node* tree){
 
     if (tree != NULL){
 
-        printf("%c ", tree->character);
-        display_tree(tree->left);
-        display_tree(tree->right);
+        // Display of a leaf node
+        if (isalpha(tree->character) != 0){
+
+            printf("(%d | %c) ", tree->frequency, tree->character);
+            display_tree(tree->left);
+            display_tree(tree->right);
+        }
+
+        // Display of an internal node
+        else{
+
+            printf("(%d) ", tree->frequency);
+            display_tree(tree->left);
+            display_tree(tree->right);
+        }
     }
 
 }
@@ -218,7 +282,6 @@ Queue* create_queue(){
     // Dynamic allocation of the queue
     Queue* q = (Queue *) malloc(sizeof(Queue));
 
-    // What is in the stack is null
     q->data_queue = NULL;
 
     return q;
@@ -241,7 +304,7 @@ int is_empty_queue(Queue* q){
 }
 
 void enqueue(Queue* q, Node* value){
-    
+
     //Add at the end
     if (value != NULL){
 
@@ -272,7 +335,7 @@ void enqueue(Queue* q, Node* value){
 
 Node* dequeue(Queue* q){
 
-     //Remove at the beginning
+    //Remove at the beginning
     if (is_empty_queue(q) == 1){
 
         return NULL;
@@ -300,8 +363,19 @@ void display_queue(Queue* q){
     // While the queue isn't empty
     while (is_empty_queue(q) == 0){
 
-        printf("[%c] ", q->data_queue->data->character);
-        q->data_queue = q->data_queue->next;
+        // Display of a character in the queue
+        if (isalpha(q->data_queue->data->character) != 0){
+
+            printf("[%c] ", q->data_queue->data->character);
+            q->data_queue = q->data_queue->next;
+        }
+
+        // Display of an internal node in the queue
+        else{
+
+            printf("[%d] ", q->data_queue->data->frequency);
+            q->data_queue = q->data_queue->next;
+        }
 
     }
 
@@ -337,7 +411,7 @@ LinkedList* delete_element_linkedlist(LinkedList* linkedList, const char x){
 
 }
 
-LinkedList* min_list(LinkedList* linkedList){
+LinkedList* min_linkedlist(LinkedList* linkedList){
 
     LinkedList* tmp = linkedList;
 
@@ -363,29 +437,144 @@ Node* create_Huffman_tree(LinkedList* linkedList){
    LinkedList* minimum_value = NULL;
 
    Node* tree = NULL;
+   Node* left = NULL;
+   Node* right = NULL;
+   Node* empty_node = NULL;
+
+   Node* Huffman_tree = NULL;
+   Node* temp = NULL;
+   Node* temp2 = NULL;
+
+   Node* left2 = NULL;
+   Node* right2 = NULL;
+   Node* empty_node2 = NULL;
+   Node* Huffman_tree2 = NULL;
+
+   Node* left3 = NULL;
+   Node* right3 = NULL;
+   Node* empty_node3 = NULL;
+   Node* Huffman_tree3 = NULL;
+
+   Node* Huffman_tree_final = NULL;
+
+   int sum_frequency = 0;
+   int sum_frequency2 = 0;
+   int sum_frequency3 = 0;
 
    while (tmp != NULL){
 
-         minimum_value = min_list(linkedList);
-         printf("The minimum in the list is the character %c that appears %d times\n", minimum_value->character, minimum_value->number_of_occurrences);
-         tree = create_node(minimum_value->character);
+         minimum_value = min_linkedlist(linkedList);
+
+         tree = create_node(minimum_value->character, minimum_value->number_of_occurrences);
 
          enqueue(q, tree);
+
+         q->data_queue->number_of_occurrences = minimum_value->number_of_occurrences;
+
          linkedList = delete_element_linkedlist(linkedList, minimum_value->character);
 
          tmp = tmp->next;
 
+        // If the list contains only one element
+        if (linkedList->next == NULL){
+
+            minimum_value = linkedList;
+            tree = create_node(minimum_value->character, minimum_value->number_of_occurrences);
+            enqueue(q, tree);
+            q->data_queue->number_of_occurrences = linkedList->number_of_occurrences;
+
+        }
+
+
     }
 
-     display_queue(q);
+        printf("\n----------------------------------------------------------\n");
 
-return tree;
+        left = dequeue(q);
+        right = dequeue(q);
+
+        empty_node = create_empty_node(left->frequency + right->frequency);
+        empty_node->left = left;
+        empty_node->right = right;
+
+        sum_frequency = left->frequency + right->frequency;
+        empty_node->frequency = sum_frequency;
+
+        add_node(&Huffman_tree, sum_frequency);
+        add_left(Huffman_tree, left->character, left->frequency);
+        add_right(Huffman_tree, right->character, right->frequency);
+
+        printf("Display subtree (prefix order) : ");
+        display_tree(Huffman_tree);
+
+        printf("\n----------------------------------------------------------");
+
+        temp = q->data_queue->data;
+
+        q->data_queue = q->data_queue->next;
+        temp2 = q->data_queue->data;
+        dequeue(q);
+
+        enqueue(q, empty_node);
+        enqueue(q, temp);
+        enqueue(q, temp2);
+
+        right2 = dequeue(q);
+        left2 = dequeue(q);
+
+        empty_node2 = create_empty_node(left2->frequency + right2->frequency);
+        empty_node2->left = left2;
+        empty_node2->right = right2;
+
+        sum_frequency2 = left2->frequency + right2->frequency;
+        empty_node2->frequency = sum_frequency2;
+
+        add_node(&Huffman_tree2, sum_frequency2);
+
+        add_left(Huffman_tree2, left2->character, left2->frequency);
+        add_right(Huffman_tree2, right2->character, right2->frequency);
+
+        printf("\nDisplay subtree (prefix order) : ");
+        display_tree(Huffman_tree2);
+
+        printf("\n----------------------------------------------------------");
+
+        enqueue(q, empty_node2);
+
+        left3 = dequeue(q);
+        right3 = dequeue(q);
+
+        empty_node3 = create_empty_node(left3->frequency + right3->frequency);
+        empty_node3->left = left3;
+        empty_node3->right = right3;
+
+        sum_frequency3 = left3->frequency + right3->frequency;
+        empty_node3->frequency = sum_frequency3;
+
+        add_node(&Huffman_tree3, sum_frequency3);
+        add_left(Huffman_tree3, left3->character, left3->frequency);
+        add_right(Huffman_tree3, right3->character, right3->frequency);
+
+        printf("\nDisplay subtree (prefix order) : ");
+        display_tree(Huffman_tree3);
+
+        printf("\n----------------------------------------------------------\n");
+
+        add_node(&Huffman_tree_final, sum_frequency3);
+        add_leaf_node(&Huffman_tree_final, left3->character, left3->frequency);
+        add_node(&Huffman_tree_final, right3->frequency);
+        add_leaf_node(&Huffman_tree_final, left2->character, left2->frequency);
+        add_node(&Huffman_tree_final, right2->frequency);
+        add_leaf_node(&Huffman_tree_final, left->character, left->frequency);
+        add_leaf_node(&Huffman_tree_final, right->character, right->frequency);
+
+    return Huffman_tree_final;
 
 }
 
-Node* Huffman_dictionary (const char* name_file, const char string_array[]){
+void Huffman_dictionary(const char* name_source_file, const char* name_destination_file, const char *dico){
 
-    return NULL;
+
 
 }
 
